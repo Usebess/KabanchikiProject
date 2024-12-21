@@ -14,9 +14,11 @@ public class Car {
     public String getModel() {
         return model;
     }
+
     public int getYear() {
         return year;
     }
+
     public int getCapacity() {
         return capacity;
     }
