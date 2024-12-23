@@ -1,6 +1,7 @@
 package com.kabanchiki.fileIO;
 
 import com.kabanchiki.core.models.*;
+import com.kabanchiki.fileIO.FileInputStrategies.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,60 +28,12 @@ public class FileInput {
             e.printStackTrace();
         }
 
-        if (type == Book.class) return readBooks(data, maxSize);
-        else if (type == Car.class) return readCars(data, maxSize);
-        else if (type == Root.class) return readRoots(data, maxSize);
+        InputStrategy inputStrategy;
+        if (type == Book.class) inputStrategy = new ReadBookStrategy();
+        else if (type == Car.class) inputStrategy = new ReadCarStrategy();
+        else if (type == Root.class) inputStrategy = new ReadRootStrategy();
         else return new ArrayList<>();
-    }
 
-    private <T> List<T> readBooks(String data, int maxSize) {
-        String regex = "Book\\[title='(.*?)', author='(.*?)', pages=(\\d+)]";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(data);
-
-        List<T> books = new ArrayList<>();
-        while (matcher.find() && books.size() < maxSize) {
-            books.add((T) new Book.BookBuilder(matcher.group(1))
-                    .setAuthor(matcher.group(2))
-                    .setPages(Integer.parseInt(matcher.group(3)))
-                    .build());
-        }
-
-        return books;
-    }
-
-    private <T> List<T> readCars(String data, int maxSize) {
-        String regex = "Car\\[model='(.*?)', year=(\\d+), capacity=(\\d+)]";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(data);
-
-        List<T> cars = new ArrayList<>();
-        while (matcher.find() && cars.size() < maxSize) {
-            cars.add(((T) new Car.CarBuilder(matcher.group(1))
-                    .setYear(Integer.parseInt(matcher.group(2)))
-                    .setCapacity(Integer.parseInt(matcher.group(3)))
-                    .build()));
-        }
-
-        return cars;
-    }
-
-    private <T> List<T> readRoots(String data, int maxSize) {
-        String regex = "Root\\[type='(.*?)', weight=(\\d+), color='(.*?)']";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(data);
-
-        List<T> roots = new ArrayList<>();
-        while (matcher.find() && roots.size() < maxSize) {
-            roots.add((T) new Root.RootBuilder(matcher.group(1))
-                    .setWeight(Integer.parseInt(matcher.group(2)))
-                    .setColor(matcher.group(3))
-                    .build());
-        }
-
-        return roots;
+        return inputStrategy.readData(data, maxSize);
     }
 }
