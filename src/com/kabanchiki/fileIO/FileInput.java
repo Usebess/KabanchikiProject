@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class FileInput {
 
-    public <T> List<T> readDataFromFile(Class<T> type) {
+    public <T> List<T> readDataFromFile(Class<T> type, int maxSize) {
         String data = "";
         Path file = Paths.get("src/com/kabanchiki/fileIO/" + type.getSimpleName() + ".txt");
 
@@ -27,20 +27,20 @@ public class FileInput {
             e.printStackTrace();
         }
 
-        if (type == Book.class) return readBooks(data);
-        else if (type == Car.class) return readCars(data);
-        else if (type == Root.class) return readRoots(data);
+        if (type == Book.class) return readBooks(data, maxSize);
+        else if (type == Car.class) return readCars(data, maxSize);
+        else if (type == Root.class) return readRoots(data, maxSize);
         else return new ArrayList<>();
     }
 
-    private <T> List<T> readBooks(String data) {
+    private <T> List<T> readBooks(String data, int maxSize) {
         String regex = "Book\\[title='(.*?)', author='(.*?)', pages=(\\d+)]";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(data);
 
         List<T> books = new ArrayList<>();
-        while (matcher.find()) {
+        while (matcher.find() && books.size() < maxSize) {
             books.add((T) new Book.BookBuilder(matcher.group(1))
                     .setAuthor(matcher.group(2))
                     .setPages(Integer.parseInt(matcher.group(3)))
@@ -50,14 +50,14 @@ public class FileInput {
         return books;
     }
 
-    private <T> List<T> readCars(String data) {
+    private <T> List<T> readCars(String data, int maxSize) {
         String regex = "Car\\[model='(.*?)', year=(\\d+), capacity=(\\d+)]";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(data);
 
         List<T> cars = new ArrayList<>();
-        while (matcher.find()) {
+        while (matcher.find() && cars.size() < maxSize) {
             cars.add(((T) new Car.CarBuilder(matcher.group(1))
                     .setYear(Integer.parseInt(matcher.group(2)))
                     .setCapacity(Integer.parseInt(matcher.group(3)))
@@ -67,14 +67,14 @@ public class FileInput {
         return cars;
     }
 
-    private <T> List<T> readRoots(String data) {
+    private <T> List<T> readRoots(String data, int maxSize) {
         String regex = "Root\\[type='(.*?)', weight=(\\d+), color='(.*?)']";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(data);
 
         List<T> roots = new ArrayList<>();
-        while (matcher.find()) {
+        while (matcher.find() && roots.size() < maxSize) {
             roots.add((T) new Root.RootBuilder(matcher.group(1))
                     .setWeight(Integer.parseInt(matcher.group(2)))
                     .setColor(matcher.group(3))
