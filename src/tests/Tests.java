@@ -90,7 +90,7 @@ public class Tests {
         List<Book> books = getMockBook2();
 
         List<Book> sort = new MergeSortStrategy<>(BookComparator.PAGES).sort(books);
-        int index = Collections.binarySearch(sort, new Book.BookBuilder("").setPages(11).build(), BookComparator.TITLE);
+        int index = Collections.binarySearch(sort, new Book.BookBuilder("").setPages(10).build(), BookComparator.PAGES);
 
         System.out.println("Sorted index: " + index);
         System.out.println(sort.get(index));
