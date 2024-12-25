@@ -1,4 +1,4 @@
-package com.kabanchiki.algorithms.sorting;
+package com.kabanchiki.algorithms.sorting.impl;
 
 import java.util.Comparator;
 

@@ -1,7 +1,7 @@
 package tests;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
-import com.kabanchiki.algorithms.sorting.MergeSortArray;
+import com.kabanchiki.algorithms.sorting.impl.MergeSortArray;
 import com.kabanchiki.algorithms.sorting.SortStrategyManager;
 import com.kabanchiki.algorithms.sorting.impl.CustomSortStrategy;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
