@@ -14,8 +14,7 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
 
     private Comparator<T> comparator = null;
 
-    public MergeSortStrategy() {
-    }
+    public MergeSortStrategy() {}
 
     public MergeSortStrategy(Comparator<T> sortedBy) {
         this.comparator = sortedBy;
@@ -24,7 +23,8 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
     @Override
     public List<T> sort(List<T> list) {
         T[] array = list.toArray((T[]) new Comparable[list.size()]);
-        return List.of(mergeSort(array, 0, array.length - 1));
+        mergeSort(array, 0, array.length - 1, getComparator());
+        return List.of(array);
     }
 
     private Comparator<T> getComparator() {
@@ -32,7 +32,7 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
     }
 
     // Метод слияния для массивов с обобщениями
-    private void merge(T[] array, int left, int middle, int right) {
+    private void merge(T[] array, int left, int middle, int right, Comparator<T> comparator) {
         int leftSize = middle - left + 1;
         int rightSize = right - middle;
 
@@ -48,7 +48,7 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
 
         // Слияние двух отсортированных частей
         while (i < leftSize && j < rightSize) {
-            if (getComparator().compare(leftArray[i], rightArray[j]) <= 0) {
+            if (comparator.compare(leftArray[i], rightArray[j]) <= 0) {
                 array[k] = leftArray[i];
                 i++;
             } else {
@@ -74,16 +74,15 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
     }
 
     // Рекурсивная сортировка слиянием
-    private T[] mergeSort(T[] array, int left, int right) {
+    private void mergeSort(T[] array, int left, int right, Comparator<T> comparator) {
         if (left < right) {
             int middle = left + (right - left) / 2;
-            mergeSort(array, left, middle); // Сортировка левой половины
-            mergeSort(array, middle + 1, right); // Сортировка правой половины
+            mergeSort(array, left, middle, comparator); // Сортировка левой половины
+            mergeSort(array, middle + 1, right, comparator); // Сортировка правой половины
 
             // Слияние отсортированных частей
-            merge(array, left, middle, right);
+            merge(array, left, middle, right, comparator);
         }
-        return array;
     }
 
 }

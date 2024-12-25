@@ -1,6 +1,7 @@
 package tests;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
+import com.kabanchiki.algorithms.sorting.impl.MergeSortArray;
 import com.kabanchiki.algorithms.sorting.SortStrategyManager;
 import com.kabanchiki.algorithms.sorting.impl.CustomSortStrategy;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
@@ -9,9 +10,7 @@ import com.kabanchiki.core.models.Book;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 public class Tests {
 
@@ -109,17 +108,24 @@ public class Tests {
 //        System.out.println("RAW DATA");
 //        books.forEach(System.out::println);
 
-        SortStrategyManager<Book> sortHolder = new SortStrategyManager<>(new MergeSortStrategy<Book>());
-        List<Book> bookSorted = sortHolder.sort(books);
+        SortStrategyManager<Book> sortManager = new SortStrategyManager<>(new MergeSortStrategy<>(BookComparator.PAGES));
+        List<Book> bookSorted = sortManager.sort(books);
+        System.out.println("MERGE SORTED DATA");
+        bookSorted.forEach(System.out::println);
 
-//        System.out.println("MERGE SORTED DATA");
-//        bookSorted.forEach(System.out::println);
+        sortManager.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
+        List<Book> bookCustomSort = sortManager.sort(books);
 
-        sortHolder.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
-        List<Book> bookCustomSort = sortHolder.sort(books);
+        System.out.println("CUSTOM SORTED DATA");
+        bookCustomSort.forEach(System.out::println);
 
-//        System.out.println("CUSTOM SORTED DATA");
-//        bookCustomSort.forEach(System.out::println);
+        Book[] array = books.toArray(Book[]::new);
+        MergeSortArray.mergeSort(array, BookComparator.PAGES);
+
+        System.out.println("ARRAY SORTED DATA");
+        List.of(array).forEach(System.out::println);
+        System.out.println("----------------------");
+
     }
 
     public void testAll() {
