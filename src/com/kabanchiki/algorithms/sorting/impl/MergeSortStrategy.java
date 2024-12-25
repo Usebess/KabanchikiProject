@@ -2,7 +2,6 @@ package com.kabanchiki.algorithms.sorting.impl;
 
 import com.kabanchiki.algorithms.sorting.SortStrategy;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,50 +23,67 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
 
     @Override
     public List<T> sort(List<T> list) {
-        return mergeSort(list);
+        T[] array = list.toArray((T[]) new Comparable[list.size()]);
+        return List.of(mergeSort(array, 0, array.length - 1));
     }
 
     private Comparator<T> getComparator() {
         return (comparator != null) ? comparator : Comparable::compareTo;
     }
 
-    private List<T> mergeSort(List<T> list) {
-        // Базовый случай: если список содержит 0 или 1 элемент, он уже отсортирован
-        if (list.size() <= 1) {
-            return list;
+    // Метод слияния для массивов с обобщениями
+    private void merge(T[] array, int left, int middle, int right) {
+        int leftSize = middle - left + 1;
+        int rightSize = right - middle;
+
+        // Создаем временные массивы для левой и правой части
+        T[] leftArray = (T[]) new Comparable[leftSize];
+        T[] rightArray = (T[]) new Comparable[rightSize];
+
+        // Копируем элементы в временные массивы
+        System.arraycopy(array, left, leftArray, 0, leftSize);
+        System.arraycopy(array, middle + 1, rightArray, 0, rightSize);
+
+        int i = 0, j = 0, k = left;
+
+        // Слияние двух отсортированных частей
+        while (i < leftSize && j < rightSize) {
+            if (getComparator().compare(leftArray[i], rightArray[j]) <= 0) {
+                array[k] = leftArray[i];
+                i++;
+            } else {
+                array[k] = rightArray[j];
+                j++;
+            }
+            k++;
         }
 
-        // Разделяем список на две части
-        int middle = list.size() / 2;
-        List<T> left = list.subList(0, middle);
-        List<T> right = list.subList(middle, list.size());
+        // Копируем оставшиеся элементы из левого массива
+        while (i < leftSize) {
+            array[k] = leftArray[i];
+            i++;
+            k++;
+        }
 
-        // Рекурсивно сортируем обе части и объединяем их
-        return merge(mergeSort(left), mergeSort(right));
+        // Копируем оставшиеся элементы из правого массива
+        while (j < rightSize) {
+            array[k] = rightArray[j];
+            j++;
+            k++;
+        }
     }
 
-    private List<T> merge(List<T> left, List<T> right) {
-        List<T> result = new ArrayList<>();
-        int leftIndex = 0, rightIndex = 0;
+    // Рекурсивная сортировка слиянием
+    private T[] mergeSort(T[] array, int left, int right) {
+        if (left < right) {
+            int middle = left + (right - left) / 2;
+            mergeSort(array, left, middle); // Сортировка левой половины
+            mergeSort(array, middle + 1, right); // Сортировка правой половины
 
-        // Определяем метод сравнения
-        Comparator<T> cmp = getComparator();
-
-        // Сравниваем элементы из обеих частей и добавляем наименьший в результат
-        while (leftIndex < left.size() && rightIndex < right.size()) {
-            result.add(cmp.compare(left.get(leftIndex), right.get(rightIndex)) <= 0 ? left.get(leftIndex++) : right.get(rightIndex++));
+            // Слияние отсортированных частей
+            merge(array, left, middle, right);
         }
-
-        // Добавляем оставшиеся элементы из левой части (если есть)
-        while (leftIndex < left.size()) {
-            result.add(left.get(leftIndex++));
-        }
-
-        // Добавляем оставшиеся элементы из правой части (если есть)
-        while (rightIndex < right.size()) {
-            result.add(right.get(rightIndex++));
-        }
-        return result;
+        return array;
     }
 
 }

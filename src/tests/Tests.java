@@ -7,6 +7,7 @@ import com.kabanchiki.core.comparators.BookComparator;
 import com.kabanchiki.core.models.Book;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -85,6 +86,16 @@ public class Tests {
                 new Book.BookBuilder("B").setAuthor("Author2").setPages(150).build()).equals(books);
     }
 
+    public void testSearch() {
+        List<Book> books = getMockBook2();
+
+        List<Book> sort = new MergeSortStrategy<>(BookComparator.PAGES).sort(books);
+        int index = Collections.binarySearch(sort, new Book.BookBuilder("").setPages(10).build(), BookComparator.PAGES);
+
+        System.out.println("Sorted index: " + index);
+        System.out.println(sort.get(index));
+    }
+
     public void testSorting() {
         List<Book> books = getMockBook2();
 
@@ -116,6 +127,7 @@ public class Tests {
         testSortingByTitle();
 
         testSorting();
+        testSearch();
     }
 
     public static void main(String[] args) {
