@@ -15,6 +15,7 @@ public class Sorting<T extends Comparable<T>> {
         this.universalMergeSort = universalMergeSort;
     }
 
+    @Override
     public List<T> sort(List<T> list) {
         return universalMergeSort.sort(list);
     }
