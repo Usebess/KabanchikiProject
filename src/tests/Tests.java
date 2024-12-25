@@ -1,6 +1,7 @@
 package tests;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
+import com.kabanchiki.algorithms.sorting.MergeSortArray;
 import com.kabanchiki.algorithms.sorting.SortStrategyManager;
 import com.kabanchiki.algorithms.sorting.impl.CustomSortStrategy;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
@@ -111,13 +112,20 @@ public class Tests {
         List<Book> bookSorted = sortManager.sort(books);
         System.out.println("MERGE SORTED DATA");
         bookSorted.forEach(System.out::println);
-        System.out.println("----------------------");
 
         sortManager.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
         List<Book> bookCustomSort = sortManager.sort(books);
 
         System.out.println("CUSTOM SORTED DATA");
         bookCustomSort.forEach(System.out::println);
+
+        Book[] array = books.toArray(Book[]::new);
+        MergeSortArray.mergeSort(array, BookComparator.PAGES);
+
+        System.out.println("ARRAY SORTED DATA");
+        List.of(array).forEach(System.out::println);
+        System.out.println("----------------------");
+
     }
 
     public void testAll() {
