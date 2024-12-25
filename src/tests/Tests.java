@@ -9,9 +9,7 @@ import com.kabanchiki.core.models.Book;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 public class Tests {
 
@@ -109,17 +107,17 @@ public class Tests {
 //        System.out.println("RAW DATA");
 //        books.forEach(System.out::println);
 
-        SortStrategyManager<Book> sortHolder = new SortStrategyManager<>(new MergeSortStrategy<Book>());
-        List<Book> bookSorted = sortHolder.sort(books);
+        SortStrategyManager<Book> sortManager = new SortStrategyManager<>(new MergeSortStrategy<>(BookComparator.PAGES));
+        List<Book> bookSorted = sortManager.sort(books);
+        System.out.println("MERGE SORTED DATA");
+        bookSorted.forEach(System.out::println);
+        System.out.println("----------------------");
 
-//        System.out.println("MERGE SORTED DATA");
-//        bookSorted.forEach(System.out::println);
+        sortManager.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
+        List<Book> bookCustomSort = sortManager.sort(books);
 
-        sortHolder.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
-        List<Book> bookCustomSort = sortHolder.sort(books);
-
-//        System.out.println("CUSTOM SORTED DATA");
-//        bookCustomSort.forEach(System.out::println);
+        System.out.println("CUSTOM SORTED DATA");
+        bookCustomSort.forEach(System.out::println);
     }
 
     public void testAll() {
