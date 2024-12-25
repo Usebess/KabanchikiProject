@@ -3,7 +3,7 @@ package com.kabanchiki.algorithms.searching;
 import java.util.List;
 import java.util.function.Function;
 
-public class BinarySearch {
+public final class BinarySearch {
 
     /**
      * Бинарный поиск для списка.
