@@ -25,7 +25,7 @@ public class UserInterface extends JFrame {
         JButton bookSortingButton = new JButton("5. Кастомная сортировка Book");
         JButton exitButton = new JButton("6. Выход");
 /*
-        //Сами кнопки на сортировку
+        //Сами кнопки на сортировку - ввод наших функций
         dataSourceButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 chooseDataSource();
