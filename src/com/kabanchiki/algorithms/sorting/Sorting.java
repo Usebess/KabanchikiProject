@@ -3,7 +3,7 @@ package algorithms.sorting;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sorting<T extends Comparable<T>> {
+public class Sorting<T extends Comparable<T>> implements UniversalMergeSort<T> {
 
     UniversalMergeSort<T> universalMergeSort;
 
