@@ -8,6 +8,8 @@ import com.kabanchiki.core.comparators.BookComparator;
 import com.kabanchiki.core.models.Book;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -86,41 +88,38 @@ public class Tests {
                 new Book.BookBuilder("B").setAuthor("Author2").setPages(150).build()).equals(books);
     }
 
-    public void testSearch() {
+    public void testBinarySearch() {
         List<Book> books = getMockBook2();
 
-        List<Book> sort = new MergeSortStrategy<>(BookComparator.TITLE).sort(books);
+        List<Book> sort = new MergeSortStrategy<>(BookComparator.PAGES).sort(books);
 
         // Компаратор для сравнения строки с названием книги
-        int i = BinarySearch.binarySearch(sort, "A", Book::getTitle);
-//        int index = Collections.binarySearch(sort, new Book.BookBuilder("").setPages(10).build(), BookComparator.PAGES);
+        int i = BinarySearch.binarySearch(sort, 8, Book::getPages);
 
-        System.out.println("Sorted index: " + i);
+        int index = Collections.binarySearch(sort, new Book.BookBuilder("").setPages(8).build(), BookComparator.PAGES);
+
         if (i >= 0) System.out.println(sort.get(i));
+        assert i == 7;
+        assert index == i;
     }
 
     public void testSorting() {
         List<Book> books = getMockBook2();
 
-        System.out.println("RAW DATA");
-        books.forEach(System.out::println);
+//        System.out.println("RAW DATA");
+//        books.forEach(System.out::println);
 
         SortStrategyManager<Book> sortHolder = new SortStrategyManager<>(new MergeSortStrategy<Book>());
         List<Book> bookSorted = sortHolder.sort(books);
 
-        System.out.println("MERGE SORTED DATA");
-        bookSorted.forEach(System.out::println);
+//        System.out.println("MERGE SORTED DATA");
+//        bookSorted.forEach(System.out::println);
 
         sortHolder.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
         List<Book> bookCustomSort = sortHolder.sort(books);
 
-        System.out.println("CUSTOM SORTED DATA");
-        bookCustomSort.forEach(System.out::println);
-    }
-
-    private void ext(Function<String, Integer> extractor) {
-        Integer apply = extractor.apply("1");
-        System.out.println(apply);
+//        System.out.println("CUSTOM SORTED DATA");
+//        bookCustomSort.forEach(System.out::println);
     }
 
     public void testAll() {
@@ -130,7 +129,7 @@ public class Tests {
         testSortingByTitle();
 
         testSorting();
-        testSearch();
+        testBinarySearch();
     }
 
     public static void main(String[] args) {
