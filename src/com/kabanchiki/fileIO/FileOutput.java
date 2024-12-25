@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class FileOutput {
     private final String FILES_PATH = "src/com/kabanchiki/fileIO/";
 
+    // При создании экземпляра чистим файлы, оставшиеся с прошлого выполнения программы.
     public FileOutput() {
         try {
             Files.deleteIfExists(Paths.get(FILES_PATH + "Book.txt"));
@@ -22,12 +23,18 @@ public class FileOutput {
         }
     }
 
+    /**
+     * Запись элементов списка в файл.
+     * @param <T>           Тип данных элементов списка.
+     * @param dataToWrite   Список с объектами для записи.
+     */
     public <T> void writeDataToFile(List<T> dataToWrite) {
         Path file = Paths.get(FILES_PATH + dataToWrite.get(0).getClass().getSimpleName() + ".txt");
         String elements = dataToWrite.stream()
                 .map(String::valueOf)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\n")); // Записываем в строку данные объекта.
 
+        // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
         try {
             if (Files.exists(file)) {
                 Files.write(file, (elements + "\n").getBytes(), StandardOpenOption.APPEND);
@@ -41,9 +48,15 @@ public class FileOutput {
         }
     }
 
+    /**
+     * Запись объекта в файл.
+     * @param <T>       Тип данных элементов списка.
+     * @param element   Объект для записи в файл.
+     */
     public <T> void writeDataToFile(T element) {
         Path file = Paths.get(FILES_PATH + element.getClass().getSimpleName() + ".txt");
 
+        // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
         try {
             if (Files.exists(file)) {
                 Files.write(file, (element + "\n").getBytes(), StandardOpenOption.APPEND);
