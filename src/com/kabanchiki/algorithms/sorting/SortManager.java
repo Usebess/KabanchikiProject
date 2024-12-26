@@ -8,10 +8,13 @@ import java.util.List;
  * Принимает другие сортировщики, реализующие интерфейс {@link SortStrategy}
  * @param <T>
  */
-public final class SortStrategyManager<T> implements SortStrategy<T> {
+public final class SortManager<T> implements SortStrategy<T> {
     private SortStrategy<T> sortStrategy;
 
-    public SortStrategyManager(SortStrategy<T> sortStrategy) {
+    public SortManager() {
+    }
+
+    public SortManager(SortStrategy<T> sortStrategy) {
         this.sortStrategy = sortStrategy;
     }
 

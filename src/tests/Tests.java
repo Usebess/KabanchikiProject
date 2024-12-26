@@ -1,9 +1,9 @@
 package tests;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
-import com.kabanchiki.algorithms.sorting.impl.MergeSortArray;
-import com.kabanchiki.algorithms.sorting.SortStrategyManager;
+import com.kabanchiki.algorithms.sorting.SortManager;
 import com.kabanchiki.algorithms.sorting.impl.CustomSortStrategy;
+import com.kabanchiki.algorithms.sorting.impl.MergeSortArray;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
 import com.kabanchiki.core.comparators.BookComparator;
 import com.kabanchiki.core.models.Book;
@@ -108,8 +108,15 @@ public class Tests {
 //        System.out.println("RAW DATA");
 //        books.forEach(System.out::println);
 
-        SortStrategyManager<Book> sortManager = new SortStrategyManager<>(new MergeSortStrategy<>(BookComparator.PAGES));
+        SortManager<Book> sortManager = new SortManager<>();
+        MergeSortStrategy<Book> mergeSortStrategy = new MergeSortStrategy<>(BookComparator.PAGES);
+        sortManager.setSortStrategy(mergeSortStrategy);
+
+//        sortManager.setSortStrategy(new MergeSortStrategy<>(CarComparator.CAPACITY));
+
         List<Book> bookSorted = sortManager.sort(books);
+//        List<Book> bookSorted = MergeSortCollection.sort(books, BookComparator.PAGES);
+
         System.out.println("MERGE SORTED DATA");
         bookSorted.forEach(System.out::println);
 

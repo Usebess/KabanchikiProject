@@ -1,8 +1,9 @@
 package com.kabanchiki.ui;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
-import com.kabanchiki.algorithms.sorting.SortStrategyManager;
+import com.kabanchiki.algorithms.sorting.SortManager;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
+import com.kabanchiki.algorithms.sorting.impl.SortCollection;
 import com.kabanchiki.core.comparators.BookComparator;
 import com.kabanchiki.core.comparators.CarComparator;
 import com.kabanchiki.core.comparators.RootComparator;
@@ -17,8 +18,6 @@ import com.kabanchiki.fileIO.FileOutput;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,24 @@ public class UserInterface extends JFrame {
 
     private FileInput fileInput = new FileInput();
 
+    private final SortManager sortingManager = new SortManager<>();
+
+    private final List<String> styles = List.of(
+            "javax.swing.plaf.metal.MetalLookAndFeel",               // Metal (CrossPlatformLookAndFeel)
+            "javax.swing.plaf.nimbus.NimbusLookAndFeel",             // Nimbus
+            "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",    // Windows
+            "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel", // Windows Classic
+            "com.sun.java.swing.plaf.gtk.GTKLookAndFeel",            // GTK+
+            "com.sun.java.swing.plaf.motif.MotifLookAndFeel"         // Motif
+    );
+
     public UserInterface() {
+        try {
+            // Устанавливаем Nimbus LAF
+            UIManager.setLookAndFeel(styles.get(1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         setTitle("Главное меню");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,211 +61,194 @@ public class UserInterface extends JFrame {
         JButton exitButton = new JButton("6. Выход");
 
         //Сами кнопки на сортировку - ввод наших функций
-        dataSourceButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                chooseDataSource();
+        dataSourceButton.addActionListener(e -> chooseDataSource());
+
+        sortingButton.addActionListener(e -> {
+            String parameterTypeInput;
+            int resultIndex;
+
+            sortingManager.setSortStrategy(new MergeSortStrategy<>());
+            List<Book> booksSorted = sortingManager.sort(books);
+            List<Car> carsSorted = sortingManager.sort(cars);
+            List<Root> rootsSorted = sortingManager.sort(roots);
+
+            System.out.println("\nОтсортированные массивы:\n\nКниги:");
+
+            if (!booksSorted.isEmpty()) {
+                booksSorted.forEach(System.out::println);
             }
-        });
 
-        sortingButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            System.out.println("\nМашины:");
 
-                String parameterTypeInput;
-                int resultIndex = -1;
+            if (!carsSorted.isEmpty()) {
+                carsSorted.forEach(System.out::println);
+            }
 
-                SortStrategyManager<Book> bookSortStrategyManager = new SortStrategyManager<>(new MergeSortStrategy<>(BookComparator.ALL));
-                SortStrategyManager<Car> carSortStrategyManager = new SortStrategyManager<>(new MergeSortStrategy<>(CarComparator.ALL));
-                SortStrategyManager<Root> rootSortStrategyManager = new SortStrategyManager<>(new MergeSortStrategy<>(RootComparator.ALL));
+            System.out.println("\nКорнеплоды:");
 
-                List<Book> booksSorted = bookSortStrategyManager.sort(books);
-                List<Car> carsSorted = carSortStrategyManager.sort(cars);
-                List<Root> rootsSorted = rootSortStrategyManager.sort(roots);
+            if (!rootsSorted.isEmpty()) {
+                rootsSorted.forEach(System.out::println);
+            }
 
-                System.out.println("\nОтсортированные массивы:\n\nКниги:");
+            String classTypeInput = JOptionPane.showInputDialog("Введите класс по которому будет производиться бинарный поиск:");
+            switch (classTypeInput.toLowerCase()) {
 
-                if (!booksSorted.isEmpty()) {
-                    booksSorted.forEach(System.out::println);
-                }
+                case "car" -> {
 
-                System.out.println("\nМашины:");
+                    parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (модель, год. мощность):");
+                    switch (parameterTypeInput.toLowerCase()) {
 
-                if (!carsSorted.isEmpty()) {
-                    carsSorted.forEach(System.out::println);
-                }
+                        case "модель" -> {
+                            String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                            resultIndex = BinarySearch.binarySearch(carsSorted, target.toLowerCase(), Car::getModel);
 
-                System.out.println("\nКорнеплоды:");
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                if (!rootsSorted.isEmpty()) {
-                    rootsSorted.forEach(System.out::println);
-                }
+                        case "мощность" -> {
+                            int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
+                            resultIndex = BinarySearch.binarySearch(carsSorted, target, Car::getCapacity);
 
-                String classTypeInput = JOptionPane.showInputDialog("Введите класс по которому будет производиться бинарный поиск:");
-                switch (classTypeInput.toLowerCase()) {
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                    case "car" -> {
+                        case "год" -> {
+                            int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
+                            resultIndex = BinarySearch.binarySearch(carsSorted, target, Car::getYear);
 
-                        parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (модель, год. мощность):");
-                        switch (parameterTypeInput.toLowerCase()) {
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            case "модель" -> {
-                                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                                resultIndex = BinarySearch.binarySearch(carsSorted, target.toLowerCase(), Car::getModel);
-
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
-
-                            case "мощность" -> {
-                                int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
-                                resultIndex = BinarySearch.binarySearch(carsSorted, target, Car::getCapacity);
-
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
-
-                            case "год" -> {
-                                int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
-                                resultIndex = BinarySearch.binarySearch(carsSorted, target, Car::getYear);
-
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
-
-                            default -> {
-                                System.out.println("Введено неверное значение");
-                            }
+                        default -> {
+                            System.out.println("Введено неверное значение");
                         }
                     }
+                }
 
-                    case "book" -> {
+                case "book" -> {
 
-                        parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (название, автор, страницы):");
-                        switch (parameterTypeInput.toLowerCase()) {
+                    parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (название, автор, страницы):");
+                    switch (parameterTypeInput.toLowerCase()) {
 
-                            case "название" -> {
-                                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                                resultIndex = BinarySearch.binarySearch(booksSorted, target.toLowerCase(), Book::getTitle);
+                        case "название" -> {
+                            String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                            resultIndex = BinarySearch.binarySearch(booksSorted, target.toLowerCase(), Book::getTitle);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            case "мощность" -> {
-                                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                                resultIndex = BinarySearch.binarySearch(booksSorted, target, Book::getAuthor);
+                        case "мощность" -> {
+                            String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                            resultIndex = BinarySearch.binarySearch(booksSorted, target, Book::getAuthor);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            case "страницы" -> {
-                                int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
-                                resultIndex = BinarySearch.binarySearch(booksSorted, target, Book::getPages);
+                        case "страницы" -> {
+                            int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
+                            resultIndex = BinarySearch.binarySearch(booksSorted, target, Book::getPages);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            default -> {
-                                System.out.println("Введено неверное значение");
-                            }
+                        default -> {
+                            System.out.println("Введено неверное значение");
                         }
                     }
+                }
 
-                    case "root" -> {
+                case "root" -> {
 
-                        parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (тип, цвет, вес):");
-                        switch (parameterTypeInput.toLowerCase()) {
+                    parameterTypeInput = JOptionPane.showInputDialog("Введите поле по которому будет происходить поиск (тип, цвет, вес):");
+                    switch (parameterTypeInput.toLowerCase()) {
 
-                            case "тип" -> {
-                                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                                resultIndex = BinarySearch.binarySearch(rootsSorted, target.toLowerCase(), Root::getType);
+                        case "тип" -> {
+                            String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                            resultIndex = BinarySearch.binarySearch(rootsSorted, target.toLowerCase(), Root::getType);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            case "цвет" -> {
-                                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                                resultIndex = BinarySearch.binarySearch(rootsSorted, target, Root::getColor);
+                        case "цвет" -> {
+                            String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                            resultIndex = BinarySearch.binarySearch(rootsSorted, target, Root::getColor);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            case "вес" -> {
-                                int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
-                                resultIndex = BinarySearch.binarySearch(rootsSorted, target, Root::getWeight);
+                        case "вес" -> {
+                            int target = Integer.parseInt(JOptionPane.showInputDialog("Введите искомое значение:"));
+                            resultIndex = BinarySearch.binarySearch(rootsSorted, target, Root::getWeight);
 
-                                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                                else System.out.println("Индекс искомого значения: " + resultIndex);
-                            }
+                            if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                            else System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
 
-                            default -> {
-                                System.out.println("Введено неверное значение");
-                            }
+                        default -> {
+                            System.out.println("Введено неверное значение");
                         }
                     }
-
-                    default -> System.out.println("Введено неверное значение");
                 }
+
+                default -> System.out.println("Введено неверное значение");
             }
         });
 
-        carSortingButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                String parameterInput = JOptionPane.showInputDialog("Введите параметр по которому будет производиться сортировка (год или мощность):");
-                switch (parameterInput.toLowerCase()) {
-
-                    case "год" -> {
-                        cars.sort(CarComparator.YEARS);
-                        System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
-                        cars.forEach(System.out::println);
-                    }
-
-                    case "мощность" -> {
-                        cars.sort(CarComparator.CAPACITY);
-                        System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
-                        cars.forEach(System.out::println);
-                    }
-
-                    default -> {
-                        System.out.println("Введено неверное значение параметра");
-                    }
+        carSortingButton.addActionListener(e -> {
+            String parameterInput = JOptionPane.showInputDialog("Введите параметр по которому будет производиться сортировка (год или мощность):");
+            switch (parameterInput.toLowerCase()) {
+                case "год" -> {
+                    sortingManager.setSortStrategy(new MergeSortStrategy<>(CarComparator.YEARS));
+                    cars = sortingManager.sort(cars);
+                    System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
+                    cars.forEach(System.out::println);
                 }
+
+                case "мощность" -> {
+                    sortingManager.setSortStrategy(new MergeSortStrategy<>(CarComparator.CAPACITY));
+                    cars = sortingManager.sort(cars);
+                    System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
+                    cars.forEach(System.out::println);
+                }
+
+                default -> System.out.println("Введено неверное значение параметра");
             }
         });
 
-        rootSortingButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                roots.sort(RootComparator.WEIGHT);
-                System.out.println("\nОтсортированный список корнеплодов по весу:");
-                roots.forEach(System.out::println);
-            }
+        rootSortingButton.addActionListener(e -> {
+            sortingManager.setSortStrategy(new MergeSortStrategy<>(RootComparator.WEIGHT));
+            roots = sortingManager.sort(roots);
+            System.out.println("\nОтсортированный список корнеплодов по весу:");
+            roots.forEach(System.out::println);
         });
 
-        bookSortingButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        bookSortingButton.addActionListener(e -> {
+            sortingManager.setSortStrategy(new MergeSortStrategy<>(BookComparator.PAGES));
 
-                books.sort(BookComparator.PAGES);
-                System.out.println("\nОтсортированный список книг по страницам:");
-                books.forEach(System.out::println);
+            // Тип сортировки через стратегию
+            books = sortingManager.sort(books);
 
-            }
+            // Тип сортировки через утилитный класс
+            books = SortCollection.mergeSort(books, BookComparator.PAGES);
+
+            System.out.println("\nОтсортированный список книг по страницам:");
+            books.forEach(System.out::println);
         });
 
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                FileOutput fileOutput = new FileOutput();
-                fileOutput.writeDataToFile(cars);
-                fileOutput.writeDataToFile(books);
-                fileOutput.writeDataToFile(roots);
-
-                System.exit(0);
-            }
+        exitButton.addActionListener(e -> {
+            FileOutput fileOutput = new FileOutput();
+            fileOutput.writeDataToFile(cars);
+            fileOutput.writeDataToFile(books);
+            fileOutput.writeDataToFile(roots);
+            System.exit(0);
         });
 
         add(dataSourceButton);
@@ -267,10 +266,14 @@ public class UserInterface extends JFrame {
         setVisible(true);
     }
 
+    private String chooseDialog(String title, String[] choose) {
+        return (String) JOptionPane.showInputDialog(null, title,
+                title, JOptionPane.QUESTION_MESSAGE, null, choose, choose[0]);
+    }
+
     private void chooseDataSource() {
         String[] options = {"Файлы", "Рандом", "Ручной ввод"};
-        String choice = (String) JOptionPane.showInputDialog(null, "Выберите источник:",
-                "Выбор источника данных", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        String choice = chooseDialog("Выбор источника данных", options);
 
         if (choice != null) {
             String lengthInput = JOptionPane.showInputDialog("Введите длину массива:");

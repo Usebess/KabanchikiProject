@@ -14,7 +14,8 @@ public class MergeSortStrategy<T extends Comparable<T>> implements SortStrategy<
 
     private Comparator<T> comparator = null;
 
-    public MergeSortStrategy() {}
+    public MergeSortStrategy() {
+    }
 
     public MergeSortStrategy(Comparator<T> sortedBy) {
         this.comparator = sortedBy;
