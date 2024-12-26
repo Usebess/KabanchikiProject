@@ -27,4 +27,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/.idea
+
+/out/
+/.idea/
+/KabanchikiProject.iml
