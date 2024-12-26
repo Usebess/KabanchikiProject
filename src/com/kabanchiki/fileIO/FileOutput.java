@@ -47,4 +47,19 @@ public class FileOutput {
             }
         }
     }
+
+    public <T> void writeFoundDataToFile(T element) {
+        Path file = Paths.get(FILES_PATH + "found" + element.getClass().getSimpleName() + "s.txt");
+
+        // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
+        try {
+            if (Files.exists(file)) {
+                Files.write(file, (element + "\n").getBytes(), StandardOpenOption.APPEND);
+            } else {
+                Files.write(file, (element + "\n").getBytes(), StandardOpenOption.CREATE_NEW);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
