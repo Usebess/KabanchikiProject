@@ -28,6 +28,7 @@ public class UserInterface extends JFrame {
     private List<Root> roots = new ArrayList<>();
 
     private FileInput fileInput = new FileInput();
+    private FileOutput fileOutput = new FileOutput();
 
     private final SortManager sortingManager = new SortManager<>();
 
@@ -59,6 +60,8 @@ public class UserInterface extends JFrame {
         JButton rootCustomSortingButton = new JButton("4. Кастомная сортировка Root по числовому полю");
         JButton bookCustomSortingButton = new JButton("5. Кастомная сортировка Book по числовому полю");
         JButton exitButton = new JButton("6. Выход");
+
+        fileOutput.deleteFoundElementFiles();
 
         //Сами кнопки на сортировку - ввод наших функций
         dataSourceButton.addActionListener(s -> chooseDataSource());
@@ -104,7 +107,7 @@ public class UserInterface extends JFrame {
         });
 
         exitButton.addActionListener(s -> {
-            FileOutput fileOutput = new FileOutput();
+            fileOutput.deleteClassListFiles();
             fileOutput.writeDataToFile(cars);
             fileOutput.writeDataToFile(books);
             fileOutput.writeDataToFile(roots);
