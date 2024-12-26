@@ -2,8 +2,8 @@ package com.kabanchiki.ui;
 
 import com.kabanchiki.algorithms.searching.BinarySearch;
 import com.kabanchiki.algorithms.sorting.SortManager;
+import com.kabanchiki.algorithms.sorting.impl.CustomSortStrategy;
 import com.kabanchiki.algorithms.sorting.impl.MergeSortStrategy;
-import com.kabanchiki.algorithms.sorting.impl.SortCollection;
 import com.kabanchiki.core.comparators.BookComparator;
 import com.kabanchiki.core.comparators.CarComparator;
 import com.kabanchiki.core.comparators.RootComparator;
@@ -55,58 +55,55 @@ public class UserInterface extends JFrame {
 
         JButton dataSourceButton = new JButton("1. Выбор источника данных для массива");
         JButton sortingButton = new JButton("2. Сортировка массива и бинарный поиск");
-        JButton carSortingButton = new JButton("3. Кастомная сортировка Car по числовому полю");
-        JButton rootSortingButton = new JButton("4. Кастомная сортировка Root по числовому полю");
-        JButton bookSortingButton = new JButton("5. Кастомная сортировка Book по числовому полю");
+        JButton carCustomSortingButton = new JButton("3. Кастомная сортировка Car по числовому полю");
+        JButton rootCustomSortingButton = new JButton("4. Кастомная сортировка Root по числовому полю");
+        JButton bookCustomSortingButton = new JButton("5. Кастомная сортировка Book по числовому полю");
         JButton exitButton = new JButton("6. Выход");
 
         //Сами кнопки на сортировку - ввод наших функций
-        dataSourceButton.addActionListener(e -> chooseDataSource());
+        dataSourceButton.addActionListener(_ -> chooseDataSource());
 
-        sortingButton.addActionListener(e -> sortAndSearch());
+        sortingButton.addActionListener(_ -> sortAndSearch());
 
-        carSortingButton.addActionListener(e -> {
-            String parameterInput = JOptionPane.showInputDialog("Введите параметр по которому будет производиться сортировка (год или мощность):");
-            switch (parameterInput.toLowerCase()) {
-                case "год" -> {
-                    sortingManager.setSortStrategy(new MergeSortStrategy<>(CarComparator.YEARS));
-                    cars = sortingManager.sort(cars);
-                    System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
-                    cars.forEach(System.out::println);
+        carCustomSortingButton.addActionListener(_ -> {
+            String parameterInput = chooseDialog("Введите параметр по которому будет производиться сортировка (год или мощность):", "", new String[]{"Год", "Мощность"});
+//            String parameterInput = JOptionPane.showInputDialog("Введите параметр по которому будет производиться сортировка (год или мощность):");
+            if (parameterInput != null)
+                switch (parameterInput.toLowerCase()) {
+                    case "год" -> {
+                        sortingManager.setSortStrategy(new CustomSortStrategy<>(CarComparator.YEARS, Car::getYear));
+                        cars = sortingManager.sort(cars);
+                        System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
+                        cars.forEach(System.out::println);
+                    }
+
+                    case "мощность" -> {
+                        sortingManager.setSortStrategy(new CustomSortStrategy<>(CarComparator.CAPACITY, Car::getCapacity));
+                        cars = sortingManager.sort(cars);
+                        System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
+                        cars.forEach(System.out::println);
+                    }
+
+                    default -> System.out.println("Введено неверное значение параметра");
                 }
-
-                case "мощность" -> {
-                    sortingManager.setSortStrategy(new MergeSortStrategy<>(CarComparator.CAPACITY));
-                    cars = sortingManager.sort(cars);
-                    System.out.println("\nОтсортированный список машин по " + parameterInput + ":");
-                    cars.forEach(System.out::println);
-                }
-
-                default -> System.out.println("Введено неверное значение параметра");
-            }
         });
 
-        rootSortingButton.addActionListener(e -> {
-            sortingManager.setSortStrategy(new MergeSortStrategy<>(RootComparator.WEIGHT));
+        rootCustomSortingButton.addActionListener(_ -> {
+            sortingManager.setSortStrategy(new CustomSortStrategy<>(RootComparator.WEIGHT, Root::getWeight));
             roots = sortingManager.sort(roots);
             System.out.println("\nОтсортированный список корнеплодов по весу:");
             roots.forEach(System.out::println);
         });
 
-        bookSortingButton.addActionListener(e -> {
-            sortingManager.setSortStrategy(new MergeSortStrategy<>(BookComparator.PAGES));
-
-            // Тип сортировки через стратегию
+        bookCustomSortingButton.addActionListener(_ -> {
+            sortingManager.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
             books = sortingManager.sort(books);
-
-            // Тип сортировки через утилитный класс
-            books = SortCollection.mergeSort(books, BookComparator.PAGES);
 
             System.out.println("\nОтсортированный список книг по страницам:");
             books.forEach(System.out::println);
         });
 
-        exitButton.addActionListener(e -> {
+        exitButton.addActionListener(_ -> {
             FileOutput fileOutput = new FileOutput();
             fileOutput.writeDataToFile(cars);
             fileOutput.writeDataToFile(books);
@@ -118,31 +115,35 @@ public class UserInterface extends JFrame {
 
         add(sortingButton);
 
-        add(carSortingButton);
+        add(carCustomSortingButton);
 
-        add(rootSortingButton);
+        add(rootCustomSortingButton);
 
-        add(bookSortingButton);
+        add(bookCustomSortingButton);
 
         add(exitButton);
 
         setVisible(true);
     }
 
-    private String chooseDialog(String title, String[] choose) {
-        return (String) JOptionPane.showInputDialog(null, title,
+    private String chooseDialog(String title, String content, String[] choose) {
+        return (String) JOptionPane.showInputDialog(null, content,
                 title, JOptionPane.QUESTION_MESSAGE, null, choose, choose[0]);
     }
 
     private void chooseDataSource() {
         String[] options = {"Файлы", "Рандом", "Ручной ввод"};
-        String choice = chooseDialog("Выбор источника данных", options);
+        String choice = chooseDialog("Выбор источника данных", "", options);
 
         if (choice != null) {
             String lengthInput = JOptionPane.showInputDialog("Введите длину массива:");
             if (lengthInput != null) {
-                int length = Integer.parseInt(lengthInput);
-                fillArray(choice, length);
+                try {
+                    int length = Integer.parseInt(lengthInput);
+                    fillArray(choice, length);
+                } catch (NumberFormatException e) {
+                    System.out.println("Неверный формат ввода");
+                }
             }
         }
         System.out.println("Неотсортированные массивы:\n\nКниги:");
@@ -154,7 +155,6 @@ public class UserInterface extends JFrame {
     }
 
     private void fillArray(String source, int length) {
-
         cars.clear();
         books.clear();
         roots.clear();
@@ -173,34 +173,37 @@ public class UserInterface extends JFrame {
                 }
             }
             case "Ручной ввод" -> {
-                for (int i = 0; i < length; i++) {
+                try {
+                    for (int i = 0; i < length; i++) {
+                        String carModelInput = JOptionPane.showInputDialog("Введите модель автомобиля:").toLowerCase();
+                        String carCapacityInput = JOptionPane.showInputDialog("Введите мощность автомобиля:");
+                        String carYearInput = JOptionPane.showInputDialog("Введите год производства автомобиля:");
 
-                    String carModelInput = JOptionPane.showInputDialog("Введите модель автомобиля:").toLowerCase();
-                    String carCapacityInput = JOptionPane.showInputDialog("Введите мощность автомобиля:");
-                    String carYearInput = JOptionPane.showInputDialog("Введите год производства автомобиля:");
+                        String bookTitleInput = JOptionPane.showInputDialog("Введите название книги:").toLowerCase();
+                        String bookAuthorInput = JOptionPane.showInputDialog("Введите автора книги:").toLowerCase();
+                        String bookPagesInput = JOptionPane.showInputDialog("Введите количество страниц в книге:");
 
-                    String bookTitleInput = JOptionPane.showInputDialog("Введите название книги:").toLowerCase();
-                    String bookAuthorInput = JOptionPane.showInputDialog("Введите автора книги:").toLowerCase();
-                    String bookPagesInput = JOptionPane.showInputDialog("Введите количество страниц в книге:");
+                        String rootTypeInput = JOptionPane.showInputDialog("Введите вид корнеплода").toLowerCase();
+                        String rootColorInput = JOptionPane.showInputDialog("Введите цвет корнеплода:").toLowerCase();
+                        String rootWeightInput = JOptionPane.showInputDialog("Введите вес корнеплода:");
 
-                    String rootTypeInput = JOptionPane.showInputDialog("Введите вид корнеплода").toLowerCase();
-                    String rootColorInput = JOptionPane.showInputDialog("Введите цвет корнеплода:").toLowerCase();
-                    String rootWeightInput = JOptionPane.showInputDialog("Введите вес корнеплода:");
+                        cars.add(new Car.CarBuilder(carModelInput)
+                                .setCapacity(carCapacityInput.isEmpty() ? 0 : Integer.parseInt(carCapacityInput))
+                                .setYear(carYearInput.isEmpty() ? 0 : Integer.parseInt(carYearInput))
+                                .build());
 
-                    cars.add(new Car.CarBuilder(carModelInput)
-                            .setCapacity(carCapacityInput.isEmpty() ? 0 : Integer.parseInt(carCapacityInput))
-                            .setYear(carYearInput.isEmpty() ? 0 : Integer.parseInt(carYearInput))
-                            .build());
+                        books.add(new Book.BookBuilder(bookTitleInput)
+                                .setAuthor(bookAuthorInput)
+                                .setPages(bookPagesInput.isEmpty() ? 0 : Integer.parseInt(bookPagesInput))
+                                .build());
 
-                    books.add(new Book.BookBuilder(bookTitleInput)
-                            .setAuthor(bookAuthorInput)
-                            .setPages(bookPagesInput.isEmpty() ? 0 : Integer.parseInt(bookPagesInput))
-                            .build());
-
-                    roots.add(new Root.RootBuilder(rootTypeInput)
-                            .setColor(rootColorInput)
-                            .setWeight(rootWeightInput.isEmpty() ? 0 : Integer.parseInt(rootWeightInput))
-                            .build());
+                        roots.add(new Root.RootBuilder(rootTypeInput)
+                                .setColor(rootColorInput)
+                                .setWeight(rootWeightInput.isEmpty() ? 0 : Integer.parseInt(rootWeightInput))
+                                .build());
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid input data");
                 }
             }
         }
@@ -233,48 +236,49 @@ public class UserInterface extends JFrame {
             rootsSorted.forEach(System.out::println);
         }
 
-        String classTypeInput = JOptionPane.showInputDialog("Введите класс по которому будет производиться бинарный поиск:");
-        switch (classTypeInput.toLowerCase()) {
+        String classTypeInput = chooseDialog("Input", "Введите класс по которому будет производиться бинарный поиск:", new String[]{"CAR", "BOOK", "ROOT"});
+//        String classTypeInput = JOptionPane.showInputDialog("Введите класс по которому будет производиться бинарный поиск:");
+        if (classTypeInput != null)
+            try {
+                switch (classTypeInput.toLowerCase()) {
+                    case "car" -> {
+                        String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                        resultIndex = BinarySearch.binarySearch(carsSorted, target.toLowerCase(), Car::getModel);
 
-            case "car" -> {
-                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                resultIndex = BinarySearch.binarySearch(carsSorted, target.toLowerCase(), Car::getModel);
+                        if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                        else {
+                            FileOutput fileOutput = new FileOutput();
+                            fileOutput.writeFoundDataToFile(carsSorted.get(resultIndex));
+                            System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
+                    }
+                    case "book" -> {
+                        String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                        resultIndex = BinarySearch.binarySearch(booksSorted, target.toLowerCase(), Book::getTitle);
 
-                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                else {
-                    FileOutput fileOutput = new FileOutput();
-                    fileOutput.writeFoundDataToFile(carsSorted.get(resultIndex));
-                    System.out.println("Индекс искомого значения: " + resultIndex);
+                        if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                        else {
+                            FileOutput fileOutput = new FileOutput();
+                            fileOutput.writeFoundDataToFile(booksSorted.get(resultIndex));
+                            System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
+                    }
+                    case "root" -> {
+                        String target = JOptionPane.showInputDialog("Введите искомое значение:");
+                        resultIndex = BinarySearch.binarySearch(rootsSorted, target.toLowerCase(), Root::getType);
+                        if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
+                        else {
+                            FileOutput fileOutput = new FileOutput();
+                            fileOutput.writeFoundDataToFile(rootsSorted.get(resultIndex));
+                            System.out.println("Индекс искомого значения: " + resultIndex);
+                        }
+                    }
+                    default -> System.out.println("Введено неверное значение");
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            case "book" -> {
-                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                resultIndex = BinarySearch.binarySearch(booksSorted, target.toLowerCase(), Book::getTitle);
-
-                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                else {
-                    FileOutput fileOutput = new FileOutput();
-                    fileOutput.writeFoundDataToFile(booksSorted.get(resultIndex));
-                    System.out.println("Индекс искомого значения: " + resultIndex);
-                }
-
-            }
-
-            case "root" -> {
-                String target = JOptionPane.showInputDialog("Введите искомое значение:");
-                resultIndex = BinarySearch.binarySearch(rootsSorted, target.toLowerCase(), Root::getType);
-
-                if (resultIndex < 0) System.out.println("Искомое значение отсутствует");
-                else {
-                    FileOutput fileOutput = new FileOutput();
-                    fileOutput.writeFoundDataToFile(rootsSorted.get(resultIndex));
-                    System.out.println("Индекс искомого значения: " + resultIndex);
-                }
-
-            }
-
-            default -> System.out.println("Введено неверное значение");
-        }
     }
+
+
 }

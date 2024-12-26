@@ -1,5 +1,4 @@
 import com.kabanchiki.ui.UserInterface;
-import tests.Tests;
 
 public class Main {
 
@@ -7,5 +6,6 @@ public class Main {
         // После успешного выполнения всех тестов продолжение выполнения программы.
 //        new Tests().testAll();
         UserInterface ui = new UserInterface();
+//        UserInterfaceByVonabe userInterfaceByVonabe = new UserInterfaceByVonabe();
     }
 }
