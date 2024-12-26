@@ -13,6 +13,7 @@ public final class BinarySearch {
      * @param target        Целевое значение, которое нужно найти.
      * @param keyExtractor  Функция, извлекающая ключ из элемента списка.
      * @return Индекс найденного элемента в списке или -1, если элемент не найден.
+     * O(log n)
      */
     public static <T, K> int binarySearch(List<T> list, K target, Function<T, Comparable<K>> keyExtractor) {
         int left = 0;

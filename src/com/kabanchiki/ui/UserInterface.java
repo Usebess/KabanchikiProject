@@ -61,11 +61,11 @@ public class UserInterface extends JFrame {
         JButton exitButton = new JButton("6. Выход");
 
         //Сами кнопки на сортировку - ввод наших функций
-        dataSourceButton.addActionListener(_ -> chooseDataSource());
+        dataSourceButton.addActionListener(s -> chooseDataSource());
 
-        sortingButton.addActionListener(_ -> sortAndSearch());
+        sortingButton.addActionListener(s -> sortAndSearch());
 
-        carCustomSortingButton.addActionListener(_ -> {
+        carCustomSortingButton.addActionListener(s -> {
             String parameterInput = chooseDialog("Введите параметр по которому будет производиться сортировка (год или мощность):", "", new String[]{"Год", "Мощность"});
 //            String parameterInput = JOptionPane.showInputDialog("Введите параметр по которому будет производиться сортировка (год или мощность):");
             if (parameterInput != null)
@@ -88,14 +88,14 @@ public class UserInterface extends JFrame {
                 }
         });
 
-        rootCustomSortingButton.addActionListener(_ -> {
+        rootCustomSortingButton.addActionListener(s -> {
             sortingManager.setSortStrategy(new CustomSortStrategy<>(RootComparator.WEIGHT, Root::getWeight));
             roots = sortingManager.sort(roots);
             System.out.println("\nОтсортированный список корнеплодов по весу:");
             roots.forEach(System.out::println);
         });
 
-        bookCustomSortingButton.addActionListener(_ -> {
+        bookCustomSortingButton.addActionListener(s -> {
             sortingManager.setSortStrategy(new CustomSortStrategy<>(BookComparator.PAGES, Book::getPages));
             books = sortingManager.sort(books);
 
@@ -103,7 +103,7 @@ public class UserInterface extends JFrame {
             books.forEach(System.out::println);
         });
 
-        exitButton.addActionListener(_ -> {
+        exitButton.addActionListener(s -> {
             FileOutput fileOutput = new FileOutput();
             fileOutput.writeDataToFile(cars);
             fileOutput.writeDataToFile(books);
