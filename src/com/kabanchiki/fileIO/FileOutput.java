@@ -29,44 +29,22 @@ public class FileOutput {
      * @param dataToWrite   Список с объектами для записи.
      */
     public <T> void writeDataToFile(List<T> dataToWrite) {
-        Path file = Paths.get(FILES_PATH + dataToWrite.get(0).getClass().getSimpleName() + ".txt");
-        String elements = dataToWrite.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining("\n")); // Записываем в строку данные объекта.
+        if(!dataToWrite.isEmpty()) {
+            Path file = Paths.get(FILES_PATH + dataToWrite.get(0).getClass().getSimpleName() + ".txt");
+            String elements = dataToWrite.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("\n")); // Записываем в строку данные объекта.
 
-        // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
-        try {
-            if (Files.exists(file)) {
-                Files.write(file, (elements + "\n").getBytes(), StandardOpenOption.APPEND);
+            // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
+            try {
+                if (Files.exists(file)) {
+                    Files.write(file, (elements + "\n").getBytes(), StandardOpenOption.APPEND);
+                } else {
+                    Files.write(file, (elements + "\n").getBytes(), StandardOpenOption.CREATE_NEW);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            else {
-                Files.write(file, (elements + "\n").getBytes(), StandardOpenOption.CREATE_NEW);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Запись объекта в файл.
-     * @param <T>       Тип данных элементов списка.
-     * @param element   Объект для записи в файл.
-     */
-    public <T> void writeDataToFile(T element) {
-        Path file = Paths.get(FILES_PATH + element.getClass().getSimpleName() + ".txt");
-
-        // Если файл существует, дописываем данные в него. Иначе создаем новый и записываем.
-        try {
-            if (Files.exists(file)) {
-                Files.write(file, (element + "\n").getBytes(), StandardOpenOption.APPEND);
-            }
-            else {
-                Files.write(file, (element + "\n").getBytes(), StandardOpenOption.CREATE_NEW);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
