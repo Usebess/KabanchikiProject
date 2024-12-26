@@ -31,7 +31,6 @@ public class ReadBookStrategy implements InputStrategy {
                     .setPages(Integer.parseInt(matcher.group(3)))
                     .build());
         }
-
         return books;
     }
 }
